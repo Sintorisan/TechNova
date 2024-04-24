@@ -1,0 +1,30 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
+@using TechNova
+@using TechNova.Client
+@using TechNova.Components
+@using TechNova.Services
+@using TechNova.Shared.Classes.Entities
+@using TechNova.Shared.Classes.DTOs.Response
+@using TechNova.Shared.Interfaces
+@using TechNova.Client.Components
+@using TechNova.Shared.Enums
+@using TechNova.Components.UI
+@using TechNova.Data
+
+
+@inject NavigationManager NavigationManager
+@inject IProductQuery ProductRepository
+@inject ICurrencyService CurrencyService
+@inject IOrderService OrderService
+@inject UserService UserService
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider StateProvider

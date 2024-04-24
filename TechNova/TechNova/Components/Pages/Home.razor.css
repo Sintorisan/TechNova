@@ -1,0 +1,40 @@
+﻿
+
+.img-display {
+    background-image: url(./img/homescreen.jpg);
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    height: 100vh;
+    width: auto;
+}
+
+.welcome {
+    height: fit-content;
+    width: 70%;
+    margin-top: 5%;
+    text-align: center;
+}
+
+.welcome h1{
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 5rem;
+
+}
+ 
+.welcome h2 {
+        font-family: "Josefin Sans", sans-serif;
+        font-size: 3rem;
+}
+
+.about-text {
+    border-radius: 50px;
+    width: 40%;
+    height: fit-content;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0px 0px 70px white;
+}
+

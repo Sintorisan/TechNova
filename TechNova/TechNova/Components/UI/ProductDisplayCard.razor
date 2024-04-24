@@ -1,0 +1,49 @@
+﻿<div class="col">
+    <div class="card card-extras h-100">
+        <a class=" h-100" style="text-decoration: none" href="/product/@Product.Id" rel="More Info">
+            <img src="@Product.ImgUri" class="card-img-top" alt="@Product.Title">
+            <div class="card-body">
+                <h5 class="card-title">@Product.Title</h5>
+                <p class="card-text">@Product.ShortDescription</p>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        @if (Product.OnSale)
+                        {
+                            <div>
+                                <p><span style="text-decoration: line-through;">@Product.Price</span>@Product.Currency.CurrencySymbols</p>
+                                <p>Discounted Price: <span style="font-weight:600; color: red">@Product.DiscountPrice@Product.Currency.CurrencySymbols</span></p>
+                            </div>
+                        }
+                        else
+                        {
+                            <p>Price: <span>@Product.Price</span>@Product.Currency.CurrencySymbols</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </a>
+        @if (IsAuthenticated)
+        {
+            <button type="button" class="btn btn-primary card-footer" @onclick="AddToCart">Add To Cart</button>
+        }else
+        {
+            <button type="button" class="btn btn-primary card-footer" disabled>Please login</button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductResponseDTO? Product { get; set; }
+
+    [Parameter]
+    public bool IsAuthenticated { get; set; }
+
+    [Parameter]
+    public EventCallback OnAddToCart { get; set; }
+
+    public void AddToCart()
+    {
+        OnAddToCart.InvokeAsync();
+    }
+}

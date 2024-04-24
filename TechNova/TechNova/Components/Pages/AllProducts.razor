@@ -1,0 +1,101 @@
+﻿@page "/products"
+
+@attribute [StreamRendering]
+@rendermode InteractiveServer
+<div class="w-100 d-flex justify-content-center">
+    <button class="btn sale-button" @onclick="DisplaySale">@message</button>
+</div>
+
+<button @onclick="Test">click</button>
+<div class="row row-cols-1 row-cols-md-4 g-5 p-5">
+    @if (Products.Count == 0)
+    {
+        @for (int i = 0; i < 8; i++)
+        {
+            <EmptyProductDisplayCard></EmptyProductDisplayCard>
+        }
+    }
+    else
+    {        
+        if (displaySale)
+        {
+            @foreach (var item in Products)
+            {
+                if (item.OnSale)
+                {
+                    <ProductDisplayCard Product="item" IsAuthenticated="authenticatedUser" OnAddToCart="(() => AddToCart(item))"></ProductDisplayCard>
+                }
+            }
+        }
+        else
+        {
+            @foreach (var item in Products)
+            {
+                <ProductDisplayCard Product="item" IsAuthenticated="authenticatedUser" OnAddToCart="(() => AddToCart(item))"></ProductDisplayCard>
+            }
+        }
+    }
+</div>
+
+
+@code {
+
+    void Test()
+    {
+        var cart = OrderService.GetUserCartAsync(user!.Id);
+    }
+
+    public List<ProductResponseDTO> Products { get; set; } = new();
+
+    bool displaySale;
+    string message => displaySale ? "Show ALL products" : "Show only SALE products";
+
+    void DisplaySale()
+    {
+        if (displaySale)
+        {
+            displaySale = false;
+        }
+        else
+        {
+            displaySale = true;
+        }
+    }   
+
+    async Task AddToCart(ProductResponseDTO product)
+    {    
+        await OrderService.AddToUserCartAsync(product, user!.Id);
+    }
+
+    void UpdateCurrency()
+    {
+        foreach (var product in Products)
+        {
+            product.Currency = CurrencyService.CurrentCurrency;
+        }
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        CurrencyService.OnCurrencyChanged -= UpdateCurrency;
+    }
+
+    private ApplicationUser? user;
+    private AuthenticationState? authenticationState;
+    bool authenticatedUser => user is null ? false : true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authenticationState = await StateProvider.GetAuthenticationStateAsync();
+        user = await UserManager.GetUserAsync(authenticationState.User);
+
+        var response = await ProductRepository.GetAllProductsAsync();
+        Products = response;
+
+        UpdateCurrency();
+        CurrencyService.OnCurrencyChanged += UpdateCurrency;
+    }
+
+}
+

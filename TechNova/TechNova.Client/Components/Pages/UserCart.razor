@@ -1,0 +1,135 @@
+﻿@page "/usercart"
+
+@rendermode InteractiveAuto
+@attribute [Authorize]
+
+
+@if (CartProducts.Count() == 0)
+{
+    <p>No items in cart</p>
+}
+else
+{
+    <div class="d-flex justify-content-around align-items-center mt-5">
+        <div style="width: 30%;">
+            <OrderForm Order="OrderFormModel" OnCreateOrder="HandleSubmit"></OrderForm>
+        </div>
+        <div style="width: 50%;">
+            <DisplayCart UserCart="CartProducts"></DisplayCart>
+        </div>
+    </div>
+}
+
+@if (isModalVisible)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Receipt</h5>
+                </div>
+                <div class="modal-body">
+                    @modalMessage
+                    <ol class="list-group list-group-numbered">
+                        @foreach (var item in CartProducts)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div>
+                                    <img src="@item.ImgUri" style="height: 40px;" />
+                                </div>
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">@item.Title</div>
+                                    @(item.OnSale ? item.DiscountPrice : item.OriginalPrice)
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    public OrderFormModel OrderFormModel { get; set; } = new();
+    public List<CartProduct> CartProducts { get; set; } = new();
+
+    bool isModalVisible = false;
+    bool isSuccess = false;
+    string modalMessage = string.Empty;
+
+
+
+    private async Task HandleSubmit(bool isValid)
+    {
+        if (isValid)
+        {
+            await CreateOrder();
+            OnValidSubmit();
+        }
+        else
+        {
+            OnInvalidSubmit();
+        }
+    }
+
+    void OnInvalidSubmit()
+    {
+        modalMessage = "Invalid form. Please fill in the form";
+        isModalVisible = true;
+    }
+
+    void OnValidSubmit()
+    {
+        modalMessage = "Order Complete! Thank you for your purchase!";
+        isModalVisible = true;
+        isSuccess = true;
+    }
+
+    public async Task CreateOrder()
+    {
+        await OrderService.CreateOrderAsync(OrderFormModel);
+    }
+
+    void CloseModal()
+    {
+        if (isSuccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            isModalVisible = false;
+        }
+
+    }
+
+    private AuthenticationState? authenticationState;
+    string? userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authenticationState = await StateProvider.GetAuthenticationStateAsync();
+        userId = authenticationState
+            .User
+            .Claims
+            .Where(c => c.Type == ClaimTypes.NameIdentifier)
+            .First()
+            .Value;
+
+        var currentCart = await OrderService.GetUserCartAsync(userId);
+        OrderFormModel.UserID = userId;
+        foreach (var product in currentCart.CartProducts)
+        {
+            CartProducts.Add(product);
+        }
+
+        StateHasChanged();
+    }
+
+}

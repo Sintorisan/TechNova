@@ -1,0 +1,49 @@
+﻿<EditForm Model="@Order" OnValidSubmit="@OnValidSubmit" OnInvalidSubmit="@OnInvalidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <lable for="streetaddress" class="form-label">Street Address</lable>
+        <InputText id="streetaddress" class="form-control" @bind-Value="Order.StreetAddress" />
+        <ValidationMessage For="() => Order.StreetAddress" />
+    </div>
+
+    <div class="mb-3">
+        <lable for="cityaddress" class="form-label">City</lable>
+        <InputText id="cityaddress" class="form-control" @bind-Value="Order.CityAddress" />
+        <ValidationMessage For="() => Order.CityAddress" />
+    </div>
+
+    <div class="mb-3">
+        <lable for="postalcode" class="form-label">Postal Code</lable>
+        <InputText id="postalcode" class="form-control" @bind-Value="Order.PostalCodeAddress" />
+        <ValidationMessage For="() => Order.PostalCodeAddress" />
+    </div>
+
+    <div class="mb-3">
+        <lable for="countryaddress" class="form-label">Country</lable>
+        <InputText id="countryaddress" class="form-control" @bind-Value="Order.CountryAddress" />
+        <ValidationMessage For="() => Order.CountryAddress" />
+    </div>
+
+    <button type="submit" class="btn btn-secondary">Purchase</button>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public OrderFormModel? Order { get; set; }
+    public int MyProperty { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnCreateOrder { get; set; }
+
+    private async Task OnValidSubmit()
+    {
+        await OnCreateOrder.InvokeAsync(true);
+    }
+
+    private async Task OnInvalidSubmit()
+    {
+        await OnCreateOrder.InvokeAsync(false);
+    }
+}

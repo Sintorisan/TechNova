@@ -1,0 +1,38 @@
+﻿@using TechNova.Shared.Classes.Entities
+@rendermode InteractiveAuto
+
+<div class="d-flex">
+    <InputSelect class="form-select" @bind-Value="currencyPair">
+        @foreach (var currency in Currencies)
+        {
+            <option value="@currency.CurrencyPair">@currency.CurrencySymbols</option>
+        }
+    </InputSelect>
+    <button type="submit" class="btn-sm btn-secondary" @onclick="ChangeCurrency">change</button>
+</div>
+
+@code {
+    List<Currency> Currencies = new List<Currency> { new Currency() };
+
+    string? currencyPair;
+
+    void ChangeCurrency()
+    {
+        var selectedCurrency = Currencies.FirstOrDefault(c => c.CurrencyPair == currencyPair);
+        if (selectedCurrency != null)
+        {
+            CurrencyService.SetCurrency(selectedCurrency);
+        }
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Currencies.AddRange(await CurrencyService.GetCurrenciesAsync());
+            StateHasChanged();
+        }
+    }
+}
+

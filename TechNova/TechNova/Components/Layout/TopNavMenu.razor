@@ -1,0 +1,101 @@
+﻿@rendermode InteractiveAuto
+
+<nav class=" navbar sticky-top navbar-expand-lg" style="background-color: gainsboro; box-shadow: 0px 2px 12px gray;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="./img/TechNova_BigT.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+            TechNova
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
+            <ul class="navbar-nav nav-underline">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        Home
+                    </NavLink>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Products
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="products">AllProducts</a></li>
+                        <li><a class="dropdown-item" href="products/category/1">Future Tech</a></li>
+                        <li><a class="dropdown-item" href="products/category/2">Wearable Gadgets</a></li>
+                        <li><a class="dropdown-item" href="products/category/3">Smart Home Devices</a></li>
+                        <li><a class="dropdown-item" href="products/category/4">Virtual Reality</a></li>
+                        <li><a class="dropdown-item" href="products/category/5">Space Exploration Gear</a></li>
+                    </ul>
+                </li>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @context.User.Identity?.Name
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><button class="dropdown-item" @onclick="GoToCart">Cart</button> </li>
+                                <li></li>
+                                <li>
+                                    <form action="Account/Logout" method="post">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                                        <button type="submit" class="nav-link">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </Authorized>
+                    <NotAuthorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Account
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item">
+                                    <NavLink class="nav-link" href="Account/Login">Login</NavLink>
+                                </li>
+                                <li class="dropdown-item">
+                                    <NavLink class="nav-link" href="Account/Register">Register</NavLink>
+                                </li>
+                            </ul>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </ul>
+        </div>
+        <CurrencyConverter></CurrencyConverter>
+    </div>
+</nav>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    AuthenticationState? authenticationState;
+
+    async Task GoToCart()
+    {
+        NavigationManager.NavigateTo("/usercart");
+    }
+}
